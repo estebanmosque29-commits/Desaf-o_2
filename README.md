@@ -618,3 +618,200 @@ public:
         usuarioActual->mostrarMetricas();
         reproduccionActiva = false;
     }
+    void menuFavoritos() {
+        if (!usuarioActual || usuarioActual->getTipoMembresia() != "premium") {
+            cout << "Esta funcionalidad es solo para usuarios premium" << endl;
+            return;
+        }
+        
+        UsuarioPremium* userPremium = dynamic_cast<UsuarioPremium*>(usuarioActual);
+        if (!userPremium) return;
+        
+        int opcion;
+        do {
+            cout << "\n=== MI LISTA DE FAVORITOS ===" << endl;
+            cout << "1. Editar mi lista de favoritos" << endl;
+            cout << "2. Seguir otra lista de favoritos" << endl;
+            cout << "3. Ejecutar mi lista de favoritos" << endl;
+            cout << "4. Mostrar mis favoritos" << endl;
+            cout << "0. Volver al menu principal" << endl;
+            cout << "Opcion: ";
+            cin >> opcion;
+            cin.ignore();
+            
+            switch (opcion) {
+                case 1: {
+                    cout << "\n--- EDITAR FAVORITOS ---" << endl;
+                    cout << "1. Agregar cancion  2. Eliminar cancion: ";
+                    int subopcion;
+                    cin >> subopcion;
+                    cin.ignore();
+                    
+                    if (subopcion == 1) {
+                        // Buscar canciones disponibles
+                        cout << "Canciones disponibles:" << endl;
+                        int contador = 1;
+                        vector<Cancion*> disponibles;
+                        
+                        for (auto& artista : artistas) {
+                            for (auto& album : artista.getAlbumes()) {
+                                for (auto& cancion : album.getCanciones()) {
+                                    cout << contador << ". " << cancion.getNombre() 
+                                         << " (ID: " << cancion.getId() << ")" << endl;
+                                    disponibles.push_back(&cancion);
+                                    contador++;
+                                }
+                            }
+                        }
+                        
+                        if (disponibles.empty()) {
+                            cout << "No hay canciones disponibles" << endl;
+                            break;
+                        }
+                        
+                        cout << "Seleccione el numero de la cancion: ";
+                        int seleccion;
+                        cin >> seleccion;
+                        cin.ignore();
+                        
+                        if (seleccion >= 1 && seleccion <= disponibles.size()) {
+                            userPremium->agregarFavorito(*disponibles[seleccion-1]);
+                        } else {
+                            cout << "Seleccion invalida" << endl;
+                        }
+                        
+                    } else if (subopcion == 2) {
+                        cout << "ID de la cancion a eliminar: ";
+                        int id;
+                        cin >> id;
+                        cin.ignore();
+                        userPremium->eliminarFavorito(id);
+                    }
+                    break;
+                }
+                case 2: {
+                    cout << "\n--- SEGUIR USUARIO ---" << endl;
+                    cout << "Nickname del usuario a seguir: ";
+                    string nickname;
+                    cin >> nickname;
+                    cin.ignore();
+                    userPremium->seguirUsuario(nickname);
+                    break;
+                }
+                case 3: {
+                    cout << "\n--- EJECUTAR FAVORITOS ---" << endl;
+                    vector<Cancion>& favoritos = userPremium->getFavoritos();
+                    
+                    if (favoritos.empty()) {
+                        cout << "No hay canciones en favoritos" << endl;
+                        break;
+                    }
+                    
+                    userPremium->mostrarFavoritos();
+                    cout << "¿Reproducir en orden original (1) o aleatorio (2)? ";
+                    int orden;
+                    cin >> orden;
+                    cin.ignore();
+                    
+                    // Simular reproduccion de favoritos
+                    cout << "Reproduciendo lista de favoritos..." << endl;
+                    for (size_t i = 0; i < favoritos.size() && i < 3; i++) { // Limitar a 3 para demo
+                        cout << "Reproduciendo: " << favoritos[i].getNombre() << endl;
+                        this_thread::sleep_for(chrono::seconds(2));
+                    }
+                    cout << "Reproduccion de favoritos completada" << endl;
+                    break;
+                }
+                case 4:
+                    userPremium->mostrarFavoritos();
+                    break;
+                case 0:
+                    cout << "Volviendo al menu principal..." << endl;
+                    break;
+                default:
+                    cout << "Opcion invalida" << endl;
+            }
+        } while (opcion != 0);
+    }
+    
+    void mostrarMenuPrincipal() {
+        int opcion;
+        do {
+            cout << "\n=== UDEATUNES ===" << endl;
+            if (usuarioActual) {
+                cout << "Usuario: " << usuarioActual->getNickname();
+                cout << " (" << usuarioActual->getTipoMembresia() << ")" << endl;
+            }
+            
+            // MOSTRAR OPCIONES DEPENDIENDO DE SI HAY SESIÓN ACTIVA O NO
+            if (!usuarioActual) {
+                // Si NO hay sesión activa
+                cout << "1. Iniciar sesion" << endl;
+                cout << "2. Reproduccion aleatoria (requiere sesion)" << endl;
+            } else {
+                // Si HAY sesión activa - QUITAMOS "Iniciar sesion"
+                cout << "2. Reproduccion aleatoria" << endl;
+                if (usuarioActual->getTipoMembresia() == "premium") {
+                    cout << "3. Mi lista de favoritos" << endl;
+                }
+                cout << "4. Cerrar sesion" << endl;
+                cout << "5. Actualizar a Premium" << endl;
+            }
+            
+            cout << "0. Salir" << endl;
+            cout << "Opcion: ";
+            cin >> opcion;
+            cin.ignore();
+            
+            switch (opcion) {
+                case 1:
+                    if (!usuarioActual) {
+                        iniciarSesion();
+                    } else {
+                        cout << "Opcion no disponible" << endl;
+                    }
+                    break;
+                case 2:
+                    reproduccionAleatoria();
+                    break;
+                case 3:
+                    if (usuarioActual && usuarioActual->getTipoMembresia() == "premium") {
+                        menuFavoritos();
+                    } else {
+                        cout << "Opcion no disponible" << endl;
+                    }
+                    break;
+                case 4:
+                    if (usuarioActual) {
+                        cerrarSesion();
+                    } else {
+                        cout << "Opcion no disponible" << endl;
+                    }
+                    break;
+                case 5:
+                    if (usuarioActual) {
+                        actualizarAPremium();
+                    } else {
+                        cout << "Opcion no disponible" << endl;
+                    }
+                    break;
+                case 0:
+                    cout << "¡Hasta pronto!" << endl;
+                    break;
+                default:
+                    cout << "Opcion invalida" << endl;
+            }
+        } while (opcion != 0);
+    }
+};
+
+// ============================ FUNCION MAIN ============================
+
+int main() {
+    cout << "Bienvenido a UdeATunes - Sistema de Streaming Musical" << endl;
+    
+    UdeATunes sistema;
+    sistema.mostrarMenuPrincipal();
+    
+    return 0;
+}
