@@ -1,3 +1,4 @@
+#include <QCoreApplication>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -96,7 +97,7 @@ public:
     int getId() const { return identificador; }
     string getRutaPortada() const { return rutaPortada; }
     vector<Cancion>& getCanciones() { return canciones; }
-    const vector<Cancion>& getCanciones() const { return canciones; } // Añadido: versión const
+    const vector<Cancion>& getCanciones() const { return canciones; }
     
     // Sobrecarga de operador <<
     friend ostream& operator<<(ostream& os, const Album& album);
@@ -129,7 +130,7 @@ public:
     // Getters
     int getCodigo() const { return codigo; }
     vector<Album>& getAlbumes() { return albumes; }
-    const vector<Album>& getAlbumes() const { return albumes; } // Añadido: versión const
+    const vector<Album>& getAlbumes() const { return albumes; }
 };
 
 class MensajePublicitario {
@@ -162,7 +163,7 @@ protected:
     string fechaInscripcion;
     int iteracionesConsumidas;
     int memoriaConsumida;
-    int reproduccionesRealizadas; // Nuevo: contador de reproducciones
+    int reproduccionesRealizadas;
 
 public:
     Usuario(string nick, string tipo, string ciu, string pa, string fecha)
@@ -177,26 +178,24 @@ public:
     string getTipoMembresia() const { return tipoMembresia; }
     int getIteraciones() const { return iteracionesConsumidas; }
     int getMemoria() const { return memoriaConsumida; }
-    int getReproduccionesRealizadas() const { return reproduccionesRealizadas; } // Nuevo getter
+    int getReproduccionesRealizadas() const { return reproduccionesRealizadas; }
     
     void setIteraciones(int iter) { iteracionesConsumidas = iter; }
     void setMemoria(int mem) { memoriaConsumida = mem; }
-    void incrementarReproducciones() { reproduccionesRealizadas++; } // Nuevo método
+    void incrementarReproducciones() { reproduccionesRealizadas++; }
     
     virtual void mostrarMetricas() {
         cout << "=== METRICAS DE CONSUMO ===" << endl;
         cout << "Iteraciones requeridas: " << iteracionesConsumidas << endl;
         cout << "Memoria consumida: " << memoriaConsumida << " bytes" << endl;
-        cout << "Reproducciones realizadas: " << reproduccionesRealizadas << endl; // Nueva métrica
+        cout << "Reproducciones realizadas: " << reproduccionesRealizadas << endl;
         cout << "============================" << endl;
     }
     
-    // Nuevo método para verificar límite de reproducciones
     virtual bool puedeReproducir() {
-        return true; // Por defecto, siempre puede reproducir
+        return true;
     }
     
-    // Nuevo método para cambiar membresía
     virtual void cambiarMembresia(const string& nuevaMembresia) {
         tipoMembresia = nuevaMembresia;
         cout << "Membresia cambiada a: " << tipoMembresia << endl;
@@ -206,7 +205,7 @@ public:
 class UsuarioEstandar : public Usuario {
 private:
     int cancionesReproducidas;
-    static const int LIMITE_REPRODUCCIONES = 10; // Límite para usuarios estándar
+    static const int LIMITE_REPRODUCCIONES = 10;
 
 public:
     UsuarioEstandar(string nick, string ciu, string pa, string fecha)
@@ -217,7 +216,6 @@ public:
         return (cancionesReproducidas % 2 == 0);
     }
     
-    // Sobrescribir el método para verificar límite
     bool puedeReproducir() override {
         if (getReproduccionesRealizadas() >= LIMITE_REPRODUCCIONES) {
             cout << "¡Has alcanzado el limite de " << LIMITE_REPRODUCCIONES << " reproducciones!" << endl;
@@ -227,7 +225,6 @@ public:
         return true;
     }
     
-    // Mostrar información del límite
     void mostrarInfoLimite() {
         int reproduccionesRestantes = LIMITE_REPRODUCCIONES - getReproduccionesRealizadas();
         cout << "Reproducciones restantes: " << reproduccionesRestantes << "/" << LIMITE_REPRODUCCIONES << endl;
@@ -249,7 +246,6 @@ public:
             return false;
         }
         
-        // Verificar si ya existe
         for (const auto& fav : favoritos) {
             if (fav == cancion) {
                 cout << "La cancion ya esta en favoritos" << endl;
@@ -291,7 +287,6 @@ public:
         cout << "Total: " << favoritos.size() << " canciones" << endl;
     }
     
-    // Los usuarios premium siempre pueden reproducir
     bool puedeReproducir() override {
         return true;
     }
@@ -307,7 +302,7 @@ private:
     Usuario* usuarioActual;
     int totalIteraciones;
     int totalMemoria;
-    bool reproduccionActiva; // Nuevo: controlar estado de reproducción
+    bool reproduccionActiva;
 
 public:
     UdeATunes() : usuarioActual(nullptr), totalIteraciones(0), totalMemoria(0), reproduccionActiva(false) {
@@ -334,7 +329,7 @@ private:
         mensajesPublicitarios.push_back(MensajePublicitario(
             "Nuevo album disponible esta semana", "C"));
         
-        // Crear artista y album de ejemplo
+        // Crear artistas y albumes de ejemplo
         Artista artista1(12345, 35, "Colombia", 50000, 1);
         
         Album album1("Lugar Secreto", 12, "2024-03-01", "Sello Indie", 
@@ -346,26 +341,62 @@ private:
                         "/users/storage/claudialorelle/audio/a tu lado_128.ogg",
                         "/users/storage/claudialorelle/audio/a tu lado_320.ogg");
         
+        Cancion cancion2("Noche estrellada", 123451202, 210,
+                        "/users/storage/claudialorelle/audio/noche estrellada_128.ogg",
+                        "/users/storage/claudialorelle/audio/noche estrellada_320.ogg");
+        
+        Cancion cancion3("Camino al amanecer", 123451203, 195,
+                        "/users/storage/claudialorelle/audio/camino al amanecer_128.ogg",
+                        "/users/storage/claudialorelle/audio/camino al amanecer_320.ogg");
+        
         Credito credito1("Carlos", "Gomez", "A123456789", "Compositor");
         cancion1.agregarCredito(credito1);
+        cancion2.agregarCredito(credito1);
+        cancion3.agregarCredito(credito1);
         
         album1.agregarCancion(cancion1);
+        album1.agregarCancion(cancion2);
+        album1.agregarCancion(cancion3);
+        
+        Album album2("Vida en Color", 13, "2024-04-15", "Sello Musical", 
+                    "/users/storage/claudialorelle/image/vida en color.png", 9.0);
+        album2.agregarGenero("Pop");
+        album2.agregarGenero("Electronica");
+        
+        Cancion cancion4("Bailando con la luna", 123451301, 220,
+                        "/users/storage/claudialorelle/audio/bailando luna_128.ogg",
+                        "/users/storage/claudialorelle/audio/bailando luna_320.ogg");
+        
+        Cancion cancion5("Ritmo urbano", 123451302, 245,
+                        "/users/storage/claudialorelle/audio/ritmo urbano_128.ogg",
+                        "/users/storage/claudialorelle/audio/ritmo urbano_320.ogg");
+        
+        Cancion cancion6("Melodia de otono", 123451303, 230,
+                        "/users/storage/claudialorelle/audio/melodia otono_128.ogg",
+                        "/users/storage/claudialorelle/audio/melodia otono_320.ogg");
+        
+        cancion4.agregarCredito(credito1);
+        cancion5.agregarCredito(credito1);
+        cancion6.agregarCredito(credito1);
+        
+        album2.agregarCancion(cancion4);
+        album2.agregarCancion(cancion5);
+        album2.agregarCancion(cancion6);
+        
         artista1.agregarAlbum(album1);
+        artista1.agregarAlbum(album2);
         artistas.push_back(artista1);
         
-        // Calcular memoria inicial aproximada
         calcularMemoriaTotal();
     }
     
     void calcularMemoriaTotal() {
         totalMemoria = 0;
         
-        // Memoria de usuarios
         for (const auto& usuario : usuarios) {
             totalMemoria += sizeof(*usuario);
         }
         
-        // Memoria de artistas y sus contenidos
         for (const auto& artista : artistas) {
             totalMemoria += sizeof(artista);
             for (const auto& album : artista.getAlbumes()) {
@@ -376,13 +407,47 @@ private:
             }
         }
         
-        // Memoria de mensajes publicitarios
         for (const auto& mensaje : mensajesPublicitarios) {
             totalMemoria += sizeof(mensaje);
         }
     }
     
-    // Nuevo método para cerrar sesión
+    vector<Cancion*> obtenerTodasLasCanciones() {
+        vector<Cancion*> todasLasCanciones;
+        for (auto& artista : artistas) {
+            for (auto& album : artista.getAlbumes()) {
+                for (auto& cancion : album.getCanciones()) {
+                    todasLasCanciones.push_back(&cancion);
+                }
+            }
+        }
+        return todasLasCanciones;
+    }
+    
+    Album* buscarAlbumDeCancion(const Cancion* cancionBuscada) {
+        for (auto& artista : artistas) {
+            for (auto& album : artista.getAlbumes()) {
+                for (auto& cancion : album.getCanciones()) {
+                    if (&cancion == cancionBuscada) {
+                        return &album;
+                    }
+                }
+            }
+        }
+        return nullptr;
+    }
+    
+    Artista* buscarArtistaDeAlbum(const Album* albumBuscado) {
+        for (auto& artista : artistas) {
+            for (auto& album : artista.getAlbumes()) {
+                if (&album == albumBuscado) {
+                    return &artista;
+                }
+            }
+        }
+        return nullptr;
+    }
+    
     void cerrarSesion() {
         if (usuarioActual) {
             cout << "Cerrando sesion de " << usuarioActual->getNickname() << "..." << endl;
@@ -393,7 +458,6 @@ private:
         }
     }
     
-    // Nuevo método para actualizar a premium
     void actualizarAPremium() {
         if (!usuarioActual) {
             cout << "Debe iniciar sesion primero" << endl;
@@ -419,7 +483,6 @@ private:
         cin.ignore();
         
         if (respuesta == 's' || respuesta == 'S') {
-            // Crear nuevo usuario premium y transferir datos
             UsuarioPremium* nuevoPremium = new UsuarioPremium(
                 usuarioActual->getNickname(), 
                 "Ciudad Actual", 
@@ -427,7 +490,6 @@ private:
                 "2024-01-01"
             );
             
-            // Reemplazar el usuario en el vector
             for (auto& usuario : usuarios) {
                 if (usuario == usuarioActual) {
                     delete usuario;
@@ -457,7 +519,6 @@ public:
                 cout << "¡Bienvenido " << nickname << "!" << endl;
                 cout << "Tipo de membresia: " << usuario->getTipoMembresia() << endl;
                 
-                // Mostrar información de límite si es usuario estándar
                 if (usuarioActual->getTipoMembresia() == "estandar") {
                     UsuarioEstandar* userEstandar = dynamic_cast<UsuarioEstandar*>(usuarioActual);
                     if (userEstandar) {
@@ -476,7 +537,6 @@ public:
             return;
         }
         
-        // Verificar si puede reproducir (límite para estándar)
         if (!usuarioActual->puedeReproducir()) {
             cout << "¿Deseas actualizar a Premium para continuar? (s/n): ";
             char respuesta;
@@ -492,15 +552,7 @@ public:
         int iteraciones = 0;
         cout << "=== REPRODUCCION ALEATORIA ===" << endl;
         
-        // Obtener todas las canciones disponibles
-        vector<Cancion*> todasLasCanciones;
-        for (auto& artista : artistas) {
-            for (auto& album : artista.getAlbumes()) {
-                for (auto& cancion : album.getCanciones()) {
-                    todasLasCanciones.push_back(&cancion);
-                }
-            }
-        }
+        vector<Cancion*> todasLasCanciones = obtenerTodasLasCanciones();
         
         if (todasLasCanciones.empty()) {
             cout << "No hay canciones disponibles" << endl;
@@ -509,48 +561,68 @@ public:
         
         srand(time(0));
         int cancionesReproducidas = 0;
-        const int K = 5; // Limite de canciones para prueba
+        const int K = 5;
+        
+        vector<int> cancionesReproducidasIds;
         
         reproduccionActiva = true;
         
-        while (cancionesReproducidas < K && reproduccionActiva) {
+        while (cancionesReproducidas < K && reproduccionActiva && !todasLasCanciones.empty()) {
             iteraciones++;
             
-            // Seleccionar cancion aleatoria
-            int indice = rand() % todasLasCanciones.size();
-            Cancion* cancion = todasLasCanciones[indice];
-            Album* albumPadre = nullptr;
+            int indice;
+            Cancion* cancionSeleccionada;
+            bool cancionNueva = false;
+            int intentos = 0;
+            const int MAX_INTENTOS = 10;
             
-            // Buscar el album padre (simplificado)
-            for (auto& artista : artistas) {
-                for (auto& album : artista.getAlbumes()) {
-                    for (auto& can : album.getCanciones()) {
-                        if (&can == cancion) {
-                            albumPadre = &album;
-                            break;
-                        }
+            do {
+                indice = rand() % todasLasCanciones.size();
+                cancionSeleccionada = todasLasCanciones[indice];
+                
+                bool yaReproducida = false;
+                for (int id : cancionesReproducidasIds) {
+                    if (id == cancionSeleccionada->getId()) {
+                        yaReproducida = true;
+                        break;
                     }
-                    if (albumPadre) break;
                 }
-                if (albumPadre) break;
+                
+                if (!yaReproducida) {
+                    cancionNueva = true;
+                    cancionesReproducidasIds.push_back(cancionSeleccionada->getId());
+                }
+                
+                intentos++;
+            } while (!cancionNueva && intentos < MAX_INTENTOS);
+            
+            if (!cancionNueva) {
+                indice = rand() % todasLasCanciones.size();
+                cancionSeleccionada = todasLasCanciones[indice];
             }
             
-            // Mostrar informacion de reproduccion
+            Album* albumPadre = buscarAlbumDeCancion(cancionSeleccionada);
+            Artista* artistaPadre = albumPadre ? buscarArtistaDeAlbum(albumPadre) : nullptr;
+            
             cout << "\n--- REPRODUCIENDO ---" << endl;
-            cout << "Artista: Artista " << (cancion->getId() / 10000) << endl;
+            if (artistaPadre) {
+                cout << "Artista: Codigo " << artistaPadre->getCodigo() << endl;
+            } else {
+                cout << "Artista: Desconocido" << endl;
+            }
             cout << "Album: " << (albumPadre ? albumPadre->getNombre() : "Desconocido") << endl;
             cout << "Ruta a la portada: " << (albumPadre ? albumPadre->getRutaPortada() : "N/A") << endl;
-            cout << "Cancion: " << cancion->getNombre() << endl;
+            cout << "Cancion: " << cancionSeleccionada->getNombre() << endl;
+            cout << "ID Cancion: " << cancionSeleccionada->getId() << endl;
             
             if (usuarioActual->getTipoMembresia() == "premium") {
-                cout << "Ruta al audio: " << cancion->getRuta320() << " (320 kbps)" << endl;
+                cout << "Ruta al audio: " << cancionSeleccionada->getRuta320() << " (320 kbps)" << endl;
             } else {
-                cout << "Ruta al audio: " << cancion->getRuta128() << " (128 kbps)" << endl;
+                cout << "Ruta al audio: " << cancionSeleccionada->getRuta128() << " (128 kbps)" << endl;
             }
             
-            cout << "Duracion: " << cancion->getDuracion() << " segundos" << endl;
+            cout << "Duracion: " << cancionSeleccionada->getDuracion() << " segundos" << endl;
             
-            // Mostrar publicidad para usuarios estandar
             if (usuarioActual->getTipoMembresia() == "estandar") {
                 UsuarioEstandar* userEstandar = dynamic_cast<UsuarioEstandar*>(usuarioActual);
                 if (userEstandar && userEstandar->debeMostrarPublicidad()) {
@@ -561,7 +633,6 @@ public:
                 }
             }
             
-            // Mostrar opciones de reproduccion con opción de detener
             cout << "\nOpciones de reproduccion:" << endl;
             cout << "1. Reproducir  2. Detener";
             if (usuarioActual->getTipoMembresia() == "premium") {
@@ -580,11 +651,10 @@ public:
                 break;
             }
             
-            cancion->reproducir();
-            usuarioActual->incrementarReproducciones(); // Incrementar contador
+            cancionSeleccionada->reproducir();
+            usuarioActual->incrementarReproducciones();
             cancionesReproducidas++;
             
-            // Mostrar información de límite para usuarios estándar
             if (usuarioActual->getTipoMembresia() == "estandar") {
                 UsuarioEstandar* userEstandar = dynamic_cast<UsuarioEstandar*>(usuarioActual);
                 if (userEstandar) {
@@ -592,14 +662,9 @@ public:
                 }
             }
             
-            // Temporizador de 3 segundos (simplificado)
             cout << "Reproduciendo... (3 segundos)" << endl;
-            
-            // Simular reproducción con posibilidad de interrupción
             for (int i = 0; i < 3 && reproduccionActiva; i++) {
                 this_thread::sleep_for(chrono::seconds(1));
-                // Podríamos agregar aquí una verificación de entrada del usuario
-                // para pausar/detener durante la reproducción
             }
             
             if (reproduccionActiva) {
@@ -607,7 +672,6 @@ public:
             }
         }
         
-        // Actualizar metricas
         usuarioActual->setIteraciones(iteraciones);
         calcularMemoriaTotal();
         usuarioActual->setMemoria(totalMemoria);
@@ -618,6 +682,7 @@ public:
         usuarioActual->mostrarMetricas();
         reproduccionActiva = false;
     }
+    
     void menuFavoritos() {
         if (!usuarioActual || usuarioActual->getTipoMembresia() != "premium") {
             cout << "Esta funcionalidad es solo para usuarios premium" << endl;
@@ -648,20 +713,14 @@ public:
                     cin.ignore();
                     
                     if (subopcion == 1) {
-                        // Buscar canciones disponibles
                         cout << "Canciones disponibles:" << endl;
                         int contador = 1;
-                        vector<Cancion*> disponibles;
+                        vector<Cancion*> disponibles = obtenerTodasLasCanciones();
                         
-                        for (auto& artista : artistas) {
-                            for (auto& album : artista.getAlbumes()) {
-                                for (auto& cancion : album.getCanciones()) {
-                                    cout << contador << ". " << cancion.getNombre() 
-                                         << " (ID: " << cancion.getId() << ")" << endl;
-                                    disponibles.push_back(&cancion);
-                                    contador++;
-                                }
-                            }
+                        for (size_t i = 0; i < disponibles.size(); i++) {
+                            cout << contador << ". " << disponibles[i]->getNombre() 
+                                 << " (ID: " << disponibles[i]->getId() << ")" << endl;
+                            contador++;
                         }
                         
                         if (disponibles.empty()) {
@@ -713,9 +772,8 @@ public:
                     cin >> orden;
                     cin.ignore();
                     
-                    // Simular reproduccion de favoritos
                     cout << "Reproduciendo lista de favoritos..." << endl;
-                    for (size_t i = 0; i < favoritos.size() && i < 3; i++) { // Limitar a 3 para demo
+                    for (size_t i = 0; i < favoritos.size() && i < 3; i++) {
                         cout << "Reproduciendo: " << favoritos[i].getNombre() << endl;
                         this_thread::sleep_for(chrono::seconds(2));
                     }
@@ -743,13 +801,10 @@ public:
                 cout << " (" << usuarioActual->getTipoMembresia() << ")" << endl;
             }
             
-            // MOSTRAR OPCIONES DEPENDIENDO DE SI HAY SESIÓN ACTIVA O NO
             if (!usuarioActual) {
-                // Si NO hay sesión activa
                 cout << "1. Iniciar sesion" << endl;
                 cout << "2. Reproduccion aleatoria (requiere sesion)" << endl;
             } else {
-                // Si HAY sesión activa - QUITAMOS "Iniciar sesion"
                 cout << "2. Reproduccion aleatoria" << endl;
                 if (usuarioActual->getTipoMembresia() == "premium") {
                     cout << "3. Mi lista de favoritos" << endl;
@@ -805,10 +860,12 @@ public:
     }
 };
 
-// ============================ FUNCION MAIN ============================
-
-int main() {
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+    
     cout << "Bienvenido a UdeATunes - Sistema de Streaming Musical" << endl;
+    cout << "-----------------------------------------------------" << endl;
     
     UdeATunes sistema;
     sistema.mostrarMenuPrincipal();
